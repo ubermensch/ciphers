@@ -52,20 +52,20 @@ func (c *Caesar) decodeByte(b byte) byte {
 	}
 }
 
-func (c *Caesar) Encode(s string) (string, error) {
+func (c *Caesar) Encode(s string) string {
 	var runes []byte
 	for _, curr := range s {
 		runes = append(runes, c.encodeByte(byte(curr)))
 	}
-	return string(runes), nil
+	return string(runes)
 }
 
-func (c *Caesar) Decode(s string) (string, error) {
+func (c *Caesar) Decode(s string) string {
 	var runes []byte
 	for _, curr := range s {
 		runes = append(runes, c.decodeByte(byte(curr)))
 	}
-	return string(runes), nil
+	return string(runes)
 }
 
 func NewCaesar(offset int) *Caesar {
