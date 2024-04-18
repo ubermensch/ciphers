@@ -21,17 +21,37 @@ type DecodeTestSuite struct {
 
 func (suite *EncodeTestSuite) SetupTest() {
 	suite.Offsets = []int{
-		7, 2, 10,
+		7, 2, 10, 3,
 	}
 	suite.Inputs = []string{
 		"The gauls are in full retreat. Tomorrow we press the advantage!",
 		"",
 		"FORWARDDDDD",
+		"3%^&@3#(6",
 	}
 	suite.ExpectedOutputs = []string{
 		"Aol nhbsz hyl pu mbss ylaylha. Avtvyyvd dl wylzz aol hkchuahnl!",
 		"",
 		"PYBGKBNNNNN",
+		"3%^&@3#(6",
+	}
+}
+
+func (suite *DecodeTestSuite) SetupTest() {
+	suite.Offsets = []int{
+		7, 2, 10, 3,
+	}
+	suite.Inputs = []string{
+		"Aol nhbsz hyl pu mbss ylaylha. Avtvyyvd dl wylzz aol hkchuahnl!",
+		"",
+		"PYBGKBNNNNN",
+		"3%^&@3#(6",
+	}
+	suite.ExpectedOutputs = []string{
+		"The gauls are in full retreat. Tomorrow we press the advantage!",
+		"",
+		"FORWARDDDDD",
+		"3%^&@3#(6",
 	}
 }
 
@@ -43,6 +63,15 @@ func (suite *EncodeTestSuite) TestEncoding() {
 	}
 }
 
-func TestCaesar_Encode(t *testing.T) {
+func (suite *DecodeTestSuite) TestDecoding() {
+	for i, offset := range suite.Offsets {
+		cs := NewCaesar(offset)
+
+		suite.Equal(suite.ExpectedOutputs[i], cs.Decode(suite.Inputs[i]))
+	}
+}
+
+func TestCaesar(t *testing.T) {
 	suite.Run(t, new(EncodeTestSuite))
+	suite.Run(t, new(DecodeTestSuite))
 }

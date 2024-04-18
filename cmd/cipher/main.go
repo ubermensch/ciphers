@@ -39,11 +39,11 @@ func vigenere() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					vig := ciphers.NewVigenere(key)
-					encoded, encodeErr := vig.Decode(str)
-					if encodeErr != nil {
+					decoded, decodeErr := vig.Decode(str)
+					if decodeErr != nil {
 						panic("could not decode string")
 					}
-					fmt.Println(encoded)
+					fmt.Println(decoded)
 					return nil
 				},
 			},
@@ -69,11 +69,7 @@ func caesar() *cli.Command {
 					}
 
 					caesar := ciphers.NewCaesar(offset)
-					encoded, encodeErr := caesar.Encode(str)
-					if encodeErr != nil {
-						panic("error: could not encode string. " + encodeErr.Error())
-					}
-
+					encoded := caesar.Encode(str)
 					fmt.Println(encoded)
 					return nil
 				},
@@ -90,11 +86,8 @@ func caesar() *cli.Command {
 					}
 
 					caesar := ciphers.NewCaesar(offset)
-					encoded, encodeErr := caesar.Decode(str)
-					if encodeErr != nil {
-						panic("error: could not encode string. " + encodeErr.Error())
-					}
-					fmt.Println(encoded)
+					decoded := caesar.Decode(str)
+					fmt.Println(decoded)
 					return nil
 				},
 			},
