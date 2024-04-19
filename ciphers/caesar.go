@@ -1,55 +1,55 @@
 package ciphers
 
+import (
+	"ciphers/lookup"
+)
+
 type Caesar struct {
-	offset int
+	offset    int
+	lowerRing *lookup.AlphaRing
+	upperRing *lookup.AlphaRing
 	Encoder
 	Decoder
 }
 
 func (c *Caesar) encodeByte(b byte) byte {
+	var encoded byte
+	var err error
+
 	switch {
-	case b <= 122 && b >= 97:
-		// lower case alpha
-		encInt := int(b) + c.offset
-		if encInt > 122 {
-			// loop back around z -> a
-			encInt = encInt - 26
-		}
-		return byte(encInt)
-	case b <= 90 && b >= 65:
-		// upper case alpha
-		encInt := int(b) + c.offset
-		if encInt > 90 {
-			// loop back around Z -> A
-			encInt = encInt - 26
-		}
-		return byte(encInt)
+	case c.lowerRing.Contains(b):
+		encoded, err = c.lowerRing.Move(b, c.offset)
+	case c.upperRing.Contains(b):
+		encoded, err = c.upperRing.Move(b, c.offset)
 	default:
-		return b
+		encoded, err = b, nil
 	}
+
+	if err != nil {
+		panic("error encoding byte")
+	}
+
+	return encoded
 }
 
 func (c *Caesar) decodeByte(b byte) byte {
+	var decoded byte
+	var err error
+
 	switch {
-	case b <= 122 && b >= 97:
-		// lower case alpha
-		encInt := int(b) - c.offset
-		if encInt < 97 {
-			// loop back around a -> z
-			encInt = encInt + 26
-		}
-		return byte(encInt)
-	case b <= 90 && b >= 65:
-		// upper case alpha
-		encInt := int(b) - c.offset
-		if encInt < 65 {
-			// loop back around Z -> A
-			encInt = encInt + 26
-		}
-		return byte(encInt)
+	case c.lowerRing.Contains(b):
+		decoded, err = c.lowerRing.Move(b, -c.offset)
+	case c.upperRing.Contains(b):
+		decoded, err = c.upperRing.Move(b, -c.offset)
 	default:
-		return b
+		decoded, err = b, nil
 	}
+
+	if err != nil {
+		panic("error decoding byte")
+	}
+
+	return decoded
 }
 
 func (c *Caesar) Encode(s string) string {
@@ -69,5 +69,9 @@ func (c *Caesar) Decode(s string) string {
 }
 
 func NewCaesar(offset int) *Caesar {
-	return &Caesar{offset: offset}
+	return &Caesar{
+		offset:    offset,
+		lowerRing: lookup.NewAlphaRing(true),
+		upperRing: lookup.NewAlphaRing(false),
+	}
 }

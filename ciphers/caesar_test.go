@@ -21,19 +21,21 @@ type DecodeTestSuite struct {
 
 func (suite *EncodeTestSuite) SetupTest() {
 	suite.Offsets = []int{
-		7, 2, 10, 3,
+		7, 2, 10, 3, 5,
 	}
 	suite.Inputs = []string{
 		"The gauls are in full retreat. Tomorrow we press the advantage!",
 		"",
 		"FORWARDDDDD",
 		"3%^&@3#(6",
+		"Today, the future is tomorrow. Tomorrow, the past is the future.",
 	}
 	suite.ExpectedOutputs = []string{
 		"Aol nhbsz hyl pu mbss ylaylha. Avtvyyvd dl wylzz aol hkchuahnl!",
 		"",
 		"PYBGKBNNNNN",
 		"3%^&@3#(6",
+		"Ytifd, ymj kzyzwj nx ytrtwwtb. Ytrtwwtb, ymj ufxy nx ymj kzyzwj.",
 	}
 }
 
