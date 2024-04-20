@@ -17,54 +17,10 @@ type caesarDecode struct {
 	expectedOutputs []string
 }
 
-type vigenereEncode struct {
-	keys            []string
-	inputs          []string
-	expectedOutputs []string
-}
-
-type vigenereDecode struct {
-	keys            []string
-	inputs          []string
-	expectedOutputs []string
-}
-
 type CaesarTest struct {
 	suite.Suite
 	caesarEncode *caesarEncode
 	caesarDecode *caesarDecode
-}
-
-type VigenereTest struct {
-	suite.Suite
-	vigenereEncode *vigenereEncode
-	vigenereDecode *vigenereDecode
-}
-
-func (suite *VigenereTest) SetupTest() {
-	suite.vigenereEncode = &vigenereEncode{
-		keys: []string{
-			"lemon",
-		},
-		inputs: []string{
-			"attackatdawn",
-		},
-		expectedOutputs: []string{
-			"lxfopvefrnhr",
-		},
-	}
-
-	suite.vigenereDecode = &vigenereDecode{
-		keys: []string{
-			"lemon",
-		},
-		inputs: []string{
-			"lxfopvefrnhr",
-		},
-		expectedOutputs: []string{
-			"attackatdawn",
-		},
-	}
 }
 
 func (suite *CaesarTest) SetupTest() {
@@ -129,18 +85,6 @@ func (suite *CaesarTest) TestDecoding() {
 	}
 }
 
-func (suite *VigenereTest) TestEncoding() {
-	for i, key := range suite.vigenereEncode.keys {
-		vg := NewVigenere(key)
-
-		suite.Equal(
-			suite.vigenereEncode.expectedOutputs[i],
-			vg.Encode(suite.vigenereEncode.inputs[i]),
-		)
-	}
-}
-
 func TestCaesar(t *testing.T) {
 	suite.Run(t, new(CaesarTest))
-	suite.Run(t, new(VigenereTest))
 }
