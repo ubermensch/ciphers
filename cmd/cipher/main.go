@@ -23,10 +23,8 @@ func vigenere() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					vig := ciphers.NewVigenere(key)
-					encoded, encodeErr := vig.Encode(str)
-					if encodeErr != nil {
-						panic("could not encode string")
-					}
+					encoded := vig.Encode(str)
+
 					fmt.Println(encoded)
 					return nil
 				},
@@ -39,10 +37,8 @@ func vigenere() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					vig := ciphers.NewVigenere(key)
-					decoded, decodeErr := vig.Decode(str)
-					if decodeErr != nil {
-						panic("could not decode string")
-					}
+					decoded := vig.Decode(str)
+
 					fmt.Println(decoded)
 					return nil
 				},

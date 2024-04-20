@@ -51,7 +51,7 @@ func (v *Vigenere) decodeByte(b byte, keyByte byte) byte {
 	return newByte
 }
 
-func (v *Vigenere) Encode(s string) (string, error) {
+func (v *Vigenere) Encode(s string) string {
 	var runes []byte
 	for i, curr := range s {
 		if !unicode.IsLetter(curr) {
@@ -65,10 +65,10 @@ func (v *Vigenere) Encode(s string) (string, error) {
 		nextByte := v.encodeByte(byte(curr), keyByte)
 		runes = append(runes, nextByte)
 	}
-	return string(runes), nil
+	return string(runes)
 }
 
-func (v *Vigenere) Decode(s string) (string, error) {
+func (v *Vigenere) Decode(s string) string {
 	var runes []byte
 	for i, curr := range s {
 		if !unicode.IsLetter(curr) {
@@ -81,7 +81,7 @@ func (v *Vigenere) Decode(s string) (string, error) {
 		keyByte := []byte(v.key)[i%len(v.key)]
 		runes = append(runes, v.decodeByte(byte(curr), keyByte))
 	}
-	return string(runes), nil
+	return string(runes)
 }
 
 func NewVigenere(key string) *Vigenere {
