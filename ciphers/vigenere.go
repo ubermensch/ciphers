@@ -1,10 +1,14 @@
 package ciphers
 
-import "unicode"
+import (
+	"ciphers/lookup"
+)
 
 // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
 type Vigenere struct {
-	key string
+	key       string
+	lowerRing *lookup.AlphaRing
+	upperRing *lookup.AlphaRing
 	Encoder
 	Decoder
 }
@@ -25,39 +29,50 @@ func (v *Vigenere) offset(b byte) int {
 }
 
 func (v *Vigenere) encodeByte(b byte, keyByte byte) byte {
+	var encoded byte
+	var err error
+
 	offset := v.offset(keyByte)
-	newByteInt := int(b) + offset
-	if newByteInt < 97 || newByteInt > 122 || (newByteInt > 90 && newByteInt < 97) {
-		newByteInt = newByteInt - 26
+	switch {
+	case v.lowerRing.Contains(b):
+		encoded, err = v.lowerRing.Move(b, offset)
+	case v.upperRing.Contains(b):
+		encoded, err = v.upperRing.Move(b, offset)
+	default:
+		encoded, err = b, nil
 	}
 
-	newByte := byte(newByteInt)
-	return newByte
+	if err != nil {
+		panic("error encoding byte")
+	}
+
+	return encoded
 }
 
 func (v *Vigenere) decodeByte(b byte, keyByte byte) byte {
+	var decoded byte
+	var err error
+
 	offset := v.offset(keyByte)
-	bInt := int(b)
-	newByteInt := bInt - offset
-	if bInt > 96 && bInt < 123 && newByteInt < 97 {
-		newByteInt = newByteInt + 26
+	switch {
+	case v.lowerRing.Contains(b):
+		decoded, err = v.lowerRing.Move(b, -offset)
+	case v.upperRing.Contains(b):
+		decoded, err = v.upperRing.Move(b, -offset)
+	default:
+		decoded, err = b, nil
 	}
 
-	if bInt > 64 && bInt < 91 && newByteInt < 65 {
-		newByteInt = newByteInt + 26
+	if err != nil {
+		panic("error decoding byte")
 	}
 
-	newByte := byte(newByteInt)
-	return newByte
+	return decoded
 }
 
 func (v *Vigenere) Encode(s string) string {
 	var runes []byte
 	for i, curr := range s {
-		if !unicode.IsLetter(curr) {
-			runes = append(runes, byte(curr))
-			continue
-		}
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
@@ -71,10 +86,6 @@ func (v *Vigenere) Encode(s string) string {
 func (v *Vigenere) Decode(s string) string {
 	var runes []byte
 	for i, curr := range s {
-		if !unicode.IsLetter(curr) {
-			runes = append(runes, byte(curr))
-			continue
-		}
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
@@ -85,5 +96,9 @@ func (v *Vigenere) Decode(s string) string {
 }
 
 func NewVigenere(key string) *Vigenere {
-	return &Vigenere{key: key}
+	return &Vigenere{
+		key:       key,
+		lowerRing: lookup.NewAlphaRing(true),
+		upperRing: lookup.NewAlphaRing(false),
+	}
 }

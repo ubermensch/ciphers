@@ -27,24 +27,36 @@ func (suite *VigenereTest) SetupTest() {
 	suite.vigenereEncode = &vigenereEncode{
 		keys: []string{
 			"lemon",
+			"b",
+			"tomorrow",
 		},
 		inputs: []string{
 			"attackatdawn",
+			"abcdefg",
+			"To whom does one belong? To the land.",
 		},
 		expectedOutputs: []string{
 			"lxfopvefrnhr",
+			"bcdefgh",
+			"Mc kyfa wcqg fba pqzfeu? Ha kys eozr.",
 		},
 	}
 
 	suite.vigenereDecode = &vigenereDecode{
 		keys: []string{
 			"lemon",
+			"b",
+			"tomorrow",
 		},
 		inputs: []string{
 			"lxfopvefrnhr",
+			"bcdefgh",
+			"Mc kyfa wcqg fba pqzfeu? Ha kys eozr.",
 		},
 		expectedOutputs: []string{
 			"attackatdawn",
+			"abcdefg",
+			"To whom does one belong? To the land.",
 		},
 	}
 }
