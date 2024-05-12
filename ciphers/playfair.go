@@ -90,4 +90,5 @@ func NewPlayfair(key string) *Playfair {
 	// build digrams from key
 
 	// build
+	return &Playfair{}
 }
