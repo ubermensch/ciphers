@@ -4,6 +4,7 @@ package ciphers
 import (
 	"ciphers/lookup"
 	"slices"
+	"strings"
 )
 
 type Playfair struct {
@@ -84,11 +85,47 @@ func gridFromKey(key string) [5][5]rune {
 	return grid
 }
 
-func NewPlayfair(key string) *Playfair {
+func getDigrams(input string) [][]rune {
+	var str = strings.ToUpper(input)
+	digrams := [][]rune{}
+
+	takeTwo := func() {
+		digrams = append(digrams, []rune{rune(str[0]), rune(str[1])})
+		str = str[2:]
+	}
+
+	takeOne := func() {
+		digrams = append(digrams, []rune{rune(str[0]), 'X'})
+		str = str[1:]
+	}
+
+	for len(str) > 0 {
+		// If there are at least 2 chars left
+		if len(str) > 1 {
+			// ...and they are not the same, form a digram from them
+			if str[0] != str[1] {
+				takeTwo()
+			} else {
+				// ...if they are the same (e.g. double 'e' in 'tree'), pad with 'X'
+				takeOne()
+			}
+		} else {
+			takeOne()
+		}
+	}
+
+	return digrams
+}
+
+func NewPlayfair(key string, input string) *Playfair {
 	// build grid from key
+	grid := gridFromKey(key)
 
-	// build digrams from key
+	// build digrams from input
+	digrams := getDigrams(input)
 
-	// build
-	return &Playfair{}
+	return &Playfair{
+		grid:    grid,
+		digrams: digrams,
+	}
 }
