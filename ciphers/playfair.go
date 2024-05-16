@@ -5,6 +5,7 @@ import (
 	"ciphers/lookup"
 	"slices"
 	"strings"
+	"unicode"
 )
 
 type Playfair struct {
@@ -26,7 +27,8 @@ func (p *Playfair) decodeByte(b byte) byte {
 	return b
 }
 
-func gridFromKey(key string) [5][5]rune {
+func gridFromKey(startKey string) [5][5]rune {
+	key := startKey
 	var grid = [5][5]rune{}
 	var usedChars = []rune{}
 	fillerFrom := 0
@@ -54,9 +56,12 @@ func gridFromKey(key string) [5][5]rune {
 		if len(key) > 0 {
 			// If we still have chars of the key, get the next one not
 			// already present in usedChars
-			for slices.Contains(usedChars, rune(key[0])) {
+			next = rune(key[0])
+			key = key[1:]
+			for slices.Contains(usedChars, next) || !unicode.IsLetter(next) {
 				next = rune(key[0])
 				key = key[1:]
+				// TODO - if we run out of `key` at this point, need to `continue`.
 			}
 		} else {
 			// If we've finished the key chars, get the next alphabetical
@@ -119,12 +124,13 @@ func getDigrams(input string) [][]rune {
 
 func NewPlayfair(key string, input string) *Playfair {
 	// build grid from key
-	grid := gridFromKey(key)
+	grid := gridFromKey(strings.ToUpper(key))
 
 	// build digrams from input
-	digrams := getDigrams(input)
+	digrams := getDigrams(strings.ToUpper(input))
 
 	return &Playfair{
+		key:     key,
 		grid:    grid,
 		digrams: digrams,
 	}
