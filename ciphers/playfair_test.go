@@ -8,7 +8,7 @@ import (
 type playfairEncode struct {
 	key             string
 	input           string
-	expectedGrid    [][]rune
+	expectedGrid    [5][5]rune
 	expectedDigrams [][]rune
 }
 
@@ -21,7 +21,7 @@ func (suite *PlayfairTest) SetupTest() {
 	suite.playfairEncode = &playfairEncode{
 		key:   "playfair example",
 		input: "hide the gold in the tree stump",
-		expectedGrid: [][]rune{
+		expectedGrid: [5][5]rune{
 			{'P', 'L', 'A', 'Y', 'F'},
 			{'I', 'R', 'E', 'X', 'M'},
 			{'B', 'C', 'D', 'G', 'H'},

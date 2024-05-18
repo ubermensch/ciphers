@@ -45,11 +45,20 @@ func gridFromKey(startKey string) [5][5]rune {
 	}
 
 	nextAlpha := func() rune {
-		next := filler.Items.Move(fillerFrom + 1).Value.(rune)
+		next, err := filler.Move('A', fillerFrom)
+		if err != nil {
+			panic(err)
+		}
 		fillerFrom++
-		return next
+		return rune(next)
 	}
 
+	// TODO - refactor this loop:
+	// * first, get nextA (from key if present, otherwise nextAlpha())
+	// * keep getting nextA while:
+	//    1) nextA is not a letter
+	//    2) nextA is present in usedChars
+	//    3) nextA is 'I' or 'J' and 'I' or 'J' present in usedChars
 	for j < 5 {
 		var next rune
 
@@ -59,14 +68,17 @@ func gridFromKey(startKey string) [5][5]rune {
 			next = rune(key[0])
 			key = key[1:]
 			for slices.Contains(usedChars, next) || !unicode.IsLetter(next) {
-				next = rune(key[0])
-				key = key[1:]
-				// TODO - if we run out of `key` at this point, need to `continue`.
+				if len(key) > 0 {
+					next = rune(key[0])
+					key = key[1:]
+				} else {
+					next = nextAlpha()
+				}
 			}
 		} else {
 			// If we've finished the key chars, get the next alphabetical
 			// character that isn't already present in the key, treating
-			// 'I' and 'J' and interchangeable
+			// 'I' and 'J' as interchangeable
 			var nextA = nextAlpha()
 			for slices.Contains(usedChars, nextA) {
 				nextA = nextAlpha()
