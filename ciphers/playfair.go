@@ -30,7 +30,7 @@ func (p *Playfair) decodeByte(b byte) byte {
 
 // Playfair doesn't handle non-letter chars and expects upper case.
 func prepareInput(input string) string {
-	rx := regexp.MustCompile(`\W+`)
+	rx := regexp.MustCompile(`[^a-zA-Z]`)
 	return strings.ToUpper(rx.ReplaceAllString(input, ``))
 }
 
@@ -146,10 +146,10 @@ func (p *Playfair) Decode(input string) (string, error) {
 
 func NewPlayfair(key string, input string) *Playfair {
 	// build grid from key
-	grid := gridFromKey(strings.ToUpper(key))
+	grid := gridFromKey(key)
 
 	// build digrams from input
-	digrams := getDigrams(strings.ToUpper(input))
+	digrams := getDigrams(input)
 
 	return &Playfair{
 		key:     key,
