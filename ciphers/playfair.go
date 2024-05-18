@@ -3,6 +3,7 @@ package ciphers
 
 import (
 	"ciphers/lookup"
+	"regexp"
 	"slices"
 	"strings"
 	"unicode"
@@ -103,7 +104,8 @@ func gridFromKey(startKey string) [5][5]rune {
 }
 
 func getDigrams(input string) [][]rune {
-	var str = strings.ToUpper(input)
+	rx := regexp.MustCompile(`\W+`)
+	var str = strings.ToUpper(rx.ReplaceAllString(input, ``))
 	digrams := [][]rune{}
 
 	takeTwo := func() {
