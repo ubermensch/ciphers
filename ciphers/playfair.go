@@ -28,8 +28,14 @@ func (p *Playfair) decodeByte(b byte) byte {
 	return b
 }
 
+// Playfair doesn't handle non-letter chars and expects upper case.
+func prepareInput(input string) string {
+	rx := regexp.MustCompile(`\W+`)
+	return strings.ToUpper(rx.ReplaceAllString(input, ``))
+}
+
 func gridFromKey(startKey string) [5][5]rune {
-	key := startKey
+	key := prepareInput(startKey)
 	var grid = [5][5]rune{}
 	var usedChars = []rune{}
 	fillerFrom := 0
@@ -45,7 +51,7 @@ func gridFromKey(startKey string) [5][5]rune {
 		j++
 	}
 
-	nextAlpha := func() rune {
+	nextFiller := func() rune {
 		next, err := filler.Move('A', fillerFrom)
 		if err != nil {
 			panic(err)
@@ -54,49 +60,44 @@ func gridFromKey(startKey string) [5][5]rune {
 		return rune(next)
 	}
 
-	// TODO - refactor this loop:
-	// * first, get nextA (from key if present, otherwise nextAlpha())
-	// * keep getting nextA while:
-	//    1) nextA is not a letter
-	//    2) nextA is present in usedChars
-	//    3) nextA is 'I' or 'J' and 'I' or 'J' present in usedChars
-	for i < 5 {
+	nextChar := func() rune {
 		var next rune
 
 		if len(key) > 0 {
-			// If we still have chars of the key, get the next one not
-			// already present in usedChars
 			next = rune(key[0])
 			key = key[1:]
-			for slices.Contains(usedChars, next) || !unicode.IsLetter(next) {
-				if len(key) > 0 {
-					next = rune(key[0])
-					key = key[1:]
-				} else {
-					next = nextAlpha()
-				}
-			}
 		} else {
-			// If we've finished the key chars, get the next alphabetical
-			// character that isn't already present in the key, treating
-			// 'I' and 'J' as interchangeable
-			var nextA = nextAlpha()
-			for slices.Contains(usedChars, nextA) {
-				nextA = nextAlpha()
-				if slices.ContainsFunc(usedChars, func(u rune) bool {
-					inter := []rune{'I', 'J'}
-					return slices.Contains(inter, nextA) && slices.Contains(inter, u)
-				}) {
-					nextA = nextAlpha()
-				}
-			}
+			next = nextFiller()
+		}
+		return next
+	}
 
-			next = nextA
+	// Is the given rune present in usedChars, and is it one of the interchangeable
+	// chars ('I' or 'J')
+	isInterchangeable := func(c rune) bool {
+		return slices.ContainsFunc(usedChars, func(u rune) bool {
+			inter := []rune{'I', 'J'}
+			return slices.Contains(inter, c) && slices.Contains(inter, u)
+		})
+	}
+
+	for i < 5 {
+		// get next (from key if present, otherwise nextFiller())
+		next := nextChar()
+
+		// keep getting next while:
+		//    1) next is not a letter
+		//    2) next is present in usedChars
+		//    3) next is 'I' or 'J' and 'I' or 'J' present in usedChars
+		for !unicode.IsLetter(next) || slices.Contains(usedChars, next) || isInterchangeable(next) {
+			next = nextChar()
 		}
 
 		grid[i][j] = next
 		usedChars = append(usedChars, next)
 
+		// move the grid pointers one space to right or to newline if filled
+		// current []rune{} slice
 		nextGridPos()
 	}
 
@@ -104,8 +105,7 @@ func gridFromKey(startKey string) [5][5]rune {
 }
 
 func getDigrams(input string) [][]rune {
-	rx := regexp.MustCompile(`\W+`)
-	var str = strings.ToUpper(rx.ReplaceAllString(input, ``))
+	str := prepareInput(input)
 	digrams := [][]rune{}
 
 	takeTwo := func() {
@@ -134,6 +134,14 @@ func getDigrams(input string) [][]rune {
 	}
 
 	return digrams
+}
+
+func (p *Playfair) Encode(input string) (string, error) {
+	return "", nil
+}
+
+func (p *Playfair) Decode(input string) (string, error) {
+	return "", nil
 }
 
 func NewPlayfair(key string, input string) *Playfair {
