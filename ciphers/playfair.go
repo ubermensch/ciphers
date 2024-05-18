@@ -36,12 +36,12 @@ func gridFromKey(startKey string) [5][5]rune {
 	i, j := 0, 0
 
 	nextGridPos := func() {
-		if i == 4 {
-			i = 0
-			j++
+		if j == 4 {
+			j = 0
+			i++
 			return
 		}
-		i++
+		j++
 	}
 
 	nextAlpha := func() rune {
@@ -59,7 +59,7 @@ func gridFromKey(startKey string) [5][5]rune {
 	//    1) nextA is not a letter
 	//    2) nextA is present in usedChars
 	//    3) nextA is 'I' or 'J' and 'I' or 'J' present in usedChars
-	for j < 5 {
+	for i < 5 {
 		var next rune
 
 		if len(key) > 0 {
