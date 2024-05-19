@@ -3,6 +3,8 @@ package ciphers
 
 import (
 	"ciphers/lookup"
+	"errors"
+	"fmt"
 	"regexp"
 	"slices"
 	"strings"
@@ -134,6 +136,99 @@ func getDigrams(input string) [][]rune {
 	}
 
 	return digrams
+}
+
+func (p *Playfair) digramPos(dg []rune) ([2]int, [2]int) {
+	diFirst, diSecond := [2]int{}, [2]int{}
+	i, j := 0, 0
+
+	for i < 5 {
+		j = 0
+		for j < 5 {
+			switch {
+			case p.grid[i][j] == dg[0]:
+				diFirst = [2]int{i, j}
+			case p.grid[i][j] == dg[1]:
+				diSecond = [2]int{i, j}
+			}
+			j++
+		}
+		i++
+	}
+
+	return diFirst, diSecond
+}
+
+// do the positions of these 2 runes in the digram form a rectangle?
+func (p *Playfair) isRectangle(dg []rune) bool {
+	firstPos, secondPos := p.digramPos(dg)
+	if firstPos[0] != secondPos[0] && firstPos[1] != secondPos[1] {
+		return true
+	}
+	return false
+}
+
+// are the positions of these 2 runes in the digram on the same row?
+func (p *Playfair) isRow(dg []rune) bool {
+	firstPos, secondPos := p.digramPos(dg)
+	if firstPos[0] == secondPos[0] {
+		return true
+	}
+	return false
+}
+
+// are the positions of these 2 runes in the digram on the same column?
+func (p *Playfair) isColumn(dg []rune) bool {
+	firstPos, secondPos := p.digramPos(dg)
+	if firstPos[1] == secondPos[1] {
+		return true
+	}
+	return false
+}
+
+func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
+	// given a row or column position (i or j), returns the new one
+	shiftPos := func(j int) int {
+		shifted := j + 1
+		if shifted >= 5 {
+			shifted = 0
+		}
+		return shifted
+	}
+
+	// given the positions of the digram elements, returns the new j value for each
+	shiftRectangle := func(firstPos [2]int, secondPos [2]int) (int, int) {
+		return secondPos[1], firstPos[1]
+	}
+
+	var encodedDigram *[]rune
+	firstPos, secondPos := p.digramPos(*dg)
+	switch {
+	case p.isRow(*dg):
+		encodedDigram = &[]rune{
+			p.grid[firstPos[0]][shiftPos(firstPos[1])],
+			p.grid[secondPos[0]][shiftPos(secondPos[1])],
+		}
+	case p.isColumn(*dg):
+		encodedDigram = &[]rune{
+			p.grid[shiftPos(firstPos[0])][firstPos[1]],
+			p.grid[shiftPos(secondPos[0])][secondPos[1]],
+		}
+	case p.isRectangle(*dg):
+		firstNewCol, secondNewCol := shiftRectangle(firstPos, secondPos)
+		encodedDigram = &[]rune{
+			p.grid[firstPos[0]][firstNewCol],
+			p.grid[secondPos[0]][secondNewCol],
+		}
+	default:
+		panic(errors.New(fmt.Sprintf("digram does not form recognized shape: %s", *dg)))
+	}
+
+	return encodedDigram
+}
+
+func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
+	return &[]rune{}
 }
 
 func (p *Playfair) Encode(input string) (string, error) {
