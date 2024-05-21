@@ -16,9 +16,19 @@ type playfairEncode struct {
 	output          string
 }
 
+type playfairDecode struct {
+	key             string
+	input           string
+	expectedGrid    [5][5]rune
+	expectedDigrams [][]rune
+	encodedDigrams  [][]rune
+	output          string
+}
+
 type PlayfairTest struct {
 	suite.Suite
 	encodeCases []*playfairEncode
+	decodeCases []*playfairDecode
 }
 
 func (suite *PlayfairTest) SetupTest() {
@@ -68,6 +78,17 @@ func (suite *PlayfairTest) SetupTest() {
 			output:          output,
 		},
 	}
+
+	suite.decodeCases = []*playfairDecode{
+		{
+			key:             "playfair example",
+			input:           output,
+			output:          "HI DE TH EG OL DI NT HE TR EX ES TU MP",
+			expectedGrid:    grid,
+			expectedDigrams: digrams,
+			encodedDigrams:  encodedDigrams,
+		},
+	}
 }
 
 func (suite *PlayfairTest) TestGrid() {
@@ -96,9 +117,21 @@ func (suite *PlayfairTest) TestEncode() {
 	for _, cs := range suite.encodeCases {
 		key, input := cs.key, cs.input
 		playfair := NewPlayfair(key, input)
-		output, err := playfair.Encode(input)
+		output := playfair.Encode(input)
+
+		suite.Equal(
+			cs.output, output,
+		)
+	}
+}
+
+func (suite *PlayfairTest) TestDecode() {
+	for _, cs := range suite.decodeCases {
+		key, input := cs.key, cs.input
+		playfair := NewPlayfair(key, input)
+		output, err := playfair.Decode(input)
 		if err != nil {
-			panic(errors.New(fmt.Sprintf("could not encode: %s", input)))
+			panic(errors.New(fmt.Sprintf("could not decode: %s", input)))
 		}
 
 		suite.Equal(

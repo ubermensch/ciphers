@@ -91,6 +91,44 @@ func caesar() *cli.Command {
 	}
 }
 
+func playfair() *cli.Command {
+	return &cli.Command{
+		Name:    "playfair",
+		Aliases: []string{"pf"},
+		Usage:   "encode or decode with Playfair cipher",
+		Subcommands: []*cli.Command{
+			{
+				Name:    "encode",
+				Aliases: []string{"e"},
+				Usage:   "encode a string",
+				Action: func(cCtx *cli.Context) error {
+					str := cCtx.Args().Get(0)
+					key := cCtx.Args().Get(1)
+					pf := ciphers.NewPlayfair(key, str)
+					encoded := pf.Encode(str)
+
+					fmt.Println(encoded)
+					return nil
+				},
+			},
+			{
+				Name:    "decode",
+				Aliases: []string{"d"},
+				Usage:   "decode a string",
+				Action: func(cCtx *cli.Context) error {
+					str := cCtx.Args().Get(0)
+					key := cCtx.Args().Get(1)
+					pf := ciphers.NewPlayfair(key, str)
+					decoded := pf.Decode(str)
+
+					fmt.Println(decoded)
+					return nil
+				},
+			},
+		},
+	}
+}
+
 func main() {
 	app := &cli.App{
 		Name:  "cipher",
@@ -98,6 +136,7 @@ func main() {
 		Commands: []*cli.Command{
 			caesar(),
 			vigenere(),
+			playfair(),
 		},
 	}
 

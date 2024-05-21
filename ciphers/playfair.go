@@ -12,6 +12,39 @@ import (
 	"unicode"
 )
 
+type gridFuncs struct {
+	// given a row or column position (i or j), returns the new one
+	shiftPos func(j int) int
+	// given the positions of the digram elements, returns the new j value for each
+	shiftRectangle func(firstPos [2]int, secondPos [2]int) (int, int)
+}
+
+var encodeFuncs = gridFuncs{
+	shiftPos: func(j int) int {
+		shifted := j + 1
+		if shifted >= 5 {
+			shifted = 0
+		}
+		return shifted
+	},
+	shiftRectangle: func(firstPos [2]int, secondPos [2]int) (int, int) {
+		return secondPos[1], firstPos[1]
+	},
+}
+
+var decodeFuncs = gridFuncs{
+	shiftPos: func(j int) int {
+		shifted := j - 1
+		if shifted < 0 {
+			shifted = 4
+		}
+		return shifted
+	},
+	shiftRectangle: func(firstPos [2]int, secondPos [2]int) (int, int) {
+		return secondPos[1], firstPos[1]
+	},
+}
+
 type Playfair struct {
 	// cipher key used to build grid
 	key string
@@ -21,14 +54,6 @@ type Playfair struct {
 	digrams [][]rune
 	Encoder
 	Decoder
-}
-
-func (p *Playfair) encodeByte(b byte) byte {
-	return b
-}
-
-func (p *Playfair) decodeByte(b byte) byte {
-	return b
 }
 
 // Playfair doesn't handle non-letter chars and expects upper case.
@@ -188,35 +213,21 @@ func (p *Playfair) isColumn(dg []rune) bool {
 }
 
 func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
-	// given a row or column position (i or j), returns the new one
-	shiftPos := func(j int) int {
-		shifted := j + 1
-		if shifted >= 5 {
-			shifted = 0
-		}
-		return shifted
-	}
-
-	// given the positions of the digram elements, returns the new j value for each
-	shiftRectangle := func(firstPos [2]int, secondPos [2]int) (int, int) {
-		return secondPos[1], firstPos[1]
-	}
-
 	var encodedDigram *[]rune
 	firstPos, secondPos := p.digramPos(*dg)
 	switch {
 	case p.isRow(*dg):
 		encodedDigram = &[]rune{
-			p.grid[firstPos[0]][shiftPos(firstPos[1])],
-			p.grid[secondPos[0]][shiftPos(secondPos[1])],
+			p.grid[firstPos[0]][encodeFuncs.shiftPos(firstPos[1])],
+			p.grid[secondPos[0]][encodeFuncs.shiftPos(secondPos[1])],
 		}
 	case p.isColumn(*dg):
 		encodedDigram = &[]rune{
-			p.grid[shiftPos(firstPos[0])][firstPos[1]],
-			p.grid[shiftPos(secondPos[0])][secondPos[1]],
+			p.grid[encodeFuncs.shiftPos(firstPos[0])][firstPos[1]],
+			p.grid[encodeFuncs.shiftPos(secondPos[0])][secondPos[1]],
 		}
 	case p.isRectangle(*dg):
-		firstNewCol, secondNewCol := shiftRectangle(firstPos, secondPos)
+		firstNewCol, secondNewCol := encodeFuncs.shiftRectangle(firstPos, secondPos)
 		encodedDigram = &[]rune{
 			p.grid[firstPos[0]][firstNewCol],
 			p.grid[secondPos[0]][secondNewCol],
@@ -233,26 +244,57 @@ func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
 }
 
 func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
-	return &[]rune{}
+	var decodedDigram *[]rune
+	firstPos, secondPos := p.digramPos(*dg)
+	switch {
+	case p.isRow(*dg):
+		decodedDigram = &[]rune{
+			p.grid[firstPos[0]][decodeFuncs.shiftPos(firstPos[1])],
+			p.grid[secondPos[0]][decodeFuncs.shiftPos(secondPos[1])],
+		}
+	case p.isColumn(*dg):
+		decodedDigram = &[]rune{
+			p.grid[decodeFuncs.shiftPos(firstPos[0])][firstPos[1]],
+			p.grid[decodeFuncs.shiftPos(secondPos[0])][secondPos[1]],
+		}
+	case p.isRectangle(*dg):
+		firstNewCol, secondNewCol := decodeFuncs.shiftRectangle(firstPos, secondPos)
+		decodedDigram = &[]rune{
+			p.grid[firstPos[0]][firstNewCol],
+			p.grid[secondPos[0]][secondNewCol],
+		}
+	default:
+		panic(
+			errors.New(
+				fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
+			),
+		)
+	}
+
+	return decodedDigram
 }
 
-func (p *Playfair) Encode(input string) (string, error) {
+func (p *Playfair) Encode(input string) string {
 	encodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
 		e := *p.encodeDigram(&dg)
 		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
 	})
 
-	return strings.Join(encodedDigrams, " "), nil
+	return strings.Join(encodedDigrams, " ")
 }
 
-func (p *Playfair) Decode(input string) (string, error) {
-	return "", nil
+func (p *Playfair) Decode(input string) string {
+	decodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
+		e := *p.decodeDigram(&dg)
+		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
+	})
+
+	return strings.Join(decodedDigrams, " ")
 }
 
 func NewPlayfair(key string, input string) *Playfair {
 	// build grid from key
 	grid := gridFromKey(key)
-
 	// build digrams from input
 	digrams := getDigrams(input)
 
