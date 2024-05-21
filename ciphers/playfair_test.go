@@ -1,8 +1,6 @@
 package ciphers
 
 import (
-	"errors"
-	"fmt"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -129,10 +127,7 @@ func (suite *PlayfairTest) TestDecode() {
 	for _, cs := range suite.decodeCases {
 		key, input := cs.key, cs.input
 		playfair := NewPlayfair(key, input)
-		output, err := playfair.Decode(input)
-		if err != nil {
-			panic(errors.New(fmt.Sprintf("could not decode: %s", input)))
-		}
+		output := playfair.Decode(input)
 
 		suite.Equal(
 			cs.output, output,
