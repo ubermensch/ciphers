@@ -5,6 +5,7 @@ import (
 	"ciphers/lookup"
 	"errors"
 	"fmt"
+	lo "github.com/samber/lo"
 	"regexp"
 	"slices"
 	"strings"
@@ -221,7 +222,11 @@ func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
 			p.grid[secondPos[0]][secondNewCol],
 		}
 	default:
-		panic(errors.New(fmt.Sprintf("digram does not form recognized shape: %s", *dg)))
+		panic(
+			errors.New(
+				fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
+			),
+		)
 	}
 
 	return encodedDigram
@@ -232,7 +237,12 @@ func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
 }
 
 func (p *Playfair) Encode(input string) (string, error) {
-	return "", nil
+	encodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
+		e := *p.encodeDigram(&dg)
+		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
+	})
+
+	return strings.Join(encodedDigrams, " "), nil
 }
 
 func (p *Playfair) Decode(input string) (string, error) {

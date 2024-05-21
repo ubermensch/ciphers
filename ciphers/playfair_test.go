@@ -1,6 +1,8 @@
 package ciphers
 
 import (
+	"errors"
+	"fmt"
 	"github.com/stretchr/testify/suite"
 	"testing"
 )
@@ -10,6 +12,8 @@ type playfairEncode struct {
 	input           string
 	expectedGrid    [5][5]rune
 	expectedDigrams [][]rune
+	encodedDigrams  [][]rune
+	output          string
 }
 
 type PlayfairTest struct {
@@ -27,19 +31,21 @@ func (suite *PlayfairTest) SetupTest() {
 	}
 
 	digrams := [][]rune{
-		{'H', 'I'},
-		{'D', 'E'},
-		{'T', 'H'},
-		{'E', 'G'},
-		{'O', 'L'},
-		{'D', 'I'},
-		{'N', 'T'},
-		{'H', 'E'},
-		{'T', 'R'},
-		{'E', 'X'},
-		{'E', 'S'},
-		{'T', 'U'},
+		{'H', 'I'}, {'D', 'E'}, {'T', 'H'},
+		{'E', 'G'}, {'O', 'L'}, {'D', 'I'},
+		{'N', 'T'}, {'H', 'E'}, {'T', 'R'},
+		{'E', 'X'}, {'E', 'S'}, {'T', 'U'},
 		{'M', 'P'},
+	}
+
+	output := "BM OD ZB XD NA BE KU DM UI XM MO UV IF"
+
+	encodedDigrams := [][]rune{
+		{'B', 'M'}, {'O', 'D'}, {'Z', 'B'},
+		{'X', 'D'}, {'N', 'A'}, {'B', 'E'},
+		{'K', 'U'}, {'D', 'M'}, {'U', 'I'},
+		{'X', 'M'}, {'M', 'O'}, {'U', 'V'},
+		{'I', 'F'},
 	}
 
 	suite.encodeCases = []*playfairEncode{
@@ -48,6 +54,8 @@ func (suite *PlayfairTest) SetupTest() {
 			input:           "hide the gold in the tree stump",
 			expectedGrid:    grid,
 			expectedDigrams: digrams,
+			encodedDigrams:  encodedDigrams,
+			output:          output,
 		},
 		// ensure the cipher ignores the non-letter chars,
 		// this test case should result in identical output to the first
@@ -56,6 +64,8 @@ func (suite *PlayfairTest) SetupTest() {
 			input:           "h*idet%7 - he gold in the tree. stump.",
 			expectedGrid:    grid,
 			expectedDigrams: digrams,
+			encodedDigrams:  encodedDigrams,
+			output:          output,
 		},
 	}
 }
@@ -78,6 +88,21 @@ func (suite *PlayfairTest) TestDigrams() {
 
 		suite.Equal(
 			cs.expectedDigrams, playfair.digrams,
+		)
+	}
+}
+
+func (suite *PlayfairTest) TestEncode() {
+	for _, cs := range suite.encodeCases {
+		key, input := cs.key, cs.input
+		playfair := NewPlayfair(key, input)
+		output, err := playfair.Encode(input)
+		if err != nil {
+			panic(errors.New(fmt.Sprintf("could not encode: %s", input)))
+		}
+
+		suite.Equal(
+			cs.output, output,
 		)
 	}
 }
