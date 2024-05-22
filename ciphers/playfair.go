@@ -275,6 +275,9 @@ func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
 }
 
 func (p *Playfair) Encode(input string) string {
+	// build digrams from input
+	p.digrams = getDigrams(input)
+
 	encodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
 		e := *p.encodeDigram(&dg)
 		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
@@ -284,6 +287,9 @@ func (p *Playfair) Encode(input string) string {
 }
 
 func (p *Playfair) Decode(input string) string {
+	// build digrams from input
+	p.digrams = getDigrams(input)
+
 	decodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
 		e := *p.decodeDigram(&dg)
 		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
@@ -292,15 +298,12 @@ func (p *Playfair) Decode(input string) string {
 	return strings.Join(decodedDigrams, " ")
 }
 
-func NewPlayfair(key string, input string) *Playfair {
+func NewPlayfair(key string) *Playfair {
 	// build grid from key
 	grid := gridFromKey(key)
-	// build digrams from input
-	digrams := getDigrams(input)
 
 	return &Playfair{
-		key:     key,
-		grid:    grid,
-		digrams: digrams,
+		key:  key,
+		grid: grid,
 	}
 }

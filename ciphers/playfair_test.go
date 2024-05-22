@@ -6,21 +6,19 @@ import (
 )
 
 type playfairEncode struct {
-	key             string
-	input           string
-	expectedGrid    [5][5]rune
-	expectedDigrams [][]rune
-	encodedDigrams  [][]rune
-	output          string
+	key     string
+	input   string
+	grid    [5][5]rune
+	digrams [][]rune
+	output  string
 }
 
 type playfairDecode struct {
-	key             string
-	input           string
-	expectedGrid    [5][5]rune
-	expectedDigrams [][]rune
-	encodedDigrams  [][]rune
-	output          string
+	key     string
+	input   string
+	grid    [5][5]rune
+	digrams [][]rune
+	output  string
 }
 
 type PlayfairTest struct {
@@ -58,55 +56,40 @@ func (suite *PlayfairTest) SetupTest() {
 
 	suite.encodeCases = []*playfairEncode{
 		{
-			key:             "playfair example",
-			input:           "hide the gold in the tree stump",
-			expectedGrid:    grid,
-			expectedDigrams: digrams,
-			encodedDigrams:  encodedDigrams,
-			output:          output,
+			key:     "playfair example",
+			input:   "hide the gold in the tree stump",
+			grid:    grid,
+			digrams: digrams,
+			output:  output,
 		},
 		// ensure the cipher ignores the non-letter chars,
 		// this test case should result in identical output to the first
 		{
-			key:             "pla  yfa - irexample",
-			input:           "h*idet%7 - he gold in the tree. stump.",
-			expectedGrid:    grid,
-			expectedDigrams: digrams,
-			encodedDigrams:  encodedDigrams,
-			output:          output,
+			key:     "pla  yfa - irexample",
+			input:   "h*idet%7 - he gold in the tree. stump.",
+			grid:    grid,
+			digrams: digrams,
+			output:  output,
 		},
 	}
 
 	suite.decodeCases = []*playfairDecode{
 		{
-			key:             "playfair example",
-			input:           output,
-			output:          "HI DE TH EG OL DI NT HE TR EX ES TU MP",
-			expectedGrid:    grid,
-			expectedDigrams: digrams,
-			encodedDigrams:  encodedDigrams,
+			key:     "playfair example",
+			input:   output,
+			output:  "HI DE TH EG OL DI NT HE TR EX ES TU MP",
+			grid:    grid,
+			digrams: encodedDigrams,
 		},
 	}
 }
 
 func (suite *PlayfairTest) TestGrid() {
 	for _, cs := range suite.encodeCases {
-		key, input := cs.key, cs.input
-		playfair := NewPlayfair(key, input)
+		playfair := NewPlayfair(cs.key)
 
 		suite.Equal(
-			cs.expectedGrid, playfair.grid,
-		)
-	}
-}
-
-func (suite *PlayfairTest) TestDigrams() {
-	for _, cs := range suite.encodeCases {
-		key, input := cs.key, cs.input
-		playfair := NewPlayfair(key, input)
-
-		suite.Equal(
-			cs.expectedDigrams, playfair.digrams,
+			cs.grid, playfair.grid,
 		)
 	}
 }
@@ -114,11 +97,14 @@ func (suite *PlayfairTest) TestDigrams() {
 func (suite *PlayfairTest) TestEncode() {
 	for _, cs := range suite.encodeCases {
 		key, input := cs.key, cs.input
-		playfair := NewPlayfair(key, input)
+		playfair := NewPlayfair(key)
 		output := playfair.Encode(input)
 
 		suite.Equal(
 			cs.output, output,
+		)
+		suite.Equal(
+			cs.digrams, playfair.digrams,
 		)
 	}
 }
@@ -126,11 +112,15 @@ func (suite *PlayfairTest) TestEncode() {
 func (suite *PlayfairTest) TestDecode() {
 	for _, cs := range suite.decodeCases {
 		key, input := cs.key, cs.input
-		playfair := NewPlayfair(key, input)
+		playfair := NewPlayfair(key)
 		output := playfair.Decode(input)
 
 		suite.Equal(
 			cs.output, output,
+		)
+
+		suite.Equal(
+			cs.digrams, playfair.digrams,
 		)
 	}
 }

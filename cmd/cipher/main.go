@@ -104,7 +104,7 @@ func playfair() *cli.Command {
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
-					pf := ciphers.NewPlayfair(key, str)
+					pf := ciphers.NewPlayfair(key)
 					encoded := pf.Encode(str)
 
 					fmt.Println(encoded)
@@ -118,7 +118,7 @@ func playfair() *cli.Command {
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
-					pf := ciphers.NewPlayfair(key, str)
+					pf := ciphers.NewPlayfair(key)
 					decoded := pf.Decode(str)
 
 					fmt.Println(decoded)
