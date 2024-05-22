@@ -51,7 +51,7 @@ func caesar() *cli.Command {
 	return &cli.Command{
 		Name:    "caesar",
 		Aliases: []string{"cs"},
-		Usage:   "encode or decode with caesar cipher",
+		Usage:   "encode or decode with Caesar cipher",
 		Subcommands: []*cli.Command{
 			{
 				Name:    "encode",
