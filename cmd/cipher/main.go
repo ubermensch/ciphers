@@ -61,7 +61,7 @@ func caesar() *cli.Command {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
 					if convErr != nil || offset < 1 {
-						panic("error: expected positive integer offset")
+						panic("expected positive integer offset")
 					}
 
 					caesar := ciphers.NewCaesar(offset)
@@ -78,7 +78,7 @@ func caesar() *cli.Command {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
 					if convErr != nil || offset < 1 {
-						panic("error: expected positive integer offset")
+						panic("expected positive integer offset")
 					}
 
 					caesar := ciphers.NewCaesar(offset)
@@ -131,8 +131,9 @@ func playfair() *cli.Command {
 
 func main() {
 	app := &cli.App{
-		Name:  "cipher",
-		Usage: "encode and decode in various historical ciphers",
+		Name:    "cipher",
+		Suggest: true,
+		Usage:   "encode and decode in various historical ciphers",
 		Commands: []*cli.Command{
 			caesar(),
 			vigenere(),
