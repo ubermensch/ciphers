@@ -18,7 +18,7 @@ func vigenere() *cli.Command {
 			{
 				Name:    "encode",
 				Aliases: []string{"e"},
-				Usage:   "encode a string",
+				Usage:   "with string to encode and key string",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
@@ -32,7 +32,7 @@ func vigenere() *cli.Command {
 			{
 				Name:    "decode",
 				Aliases: []string{"d"},
-				Usage:   "decode a string",
+				Usage:   "with string to decode and key string",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
@@ -56,7 +56,7 @@ func caesar() *cli.Command {
 			{
 				Name:    "encode",
 				Aliases: []string{"e"},
-				Usage:   "encode a string",
+				Usage:   "with string to encode and positive integer offset",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
@@ -73,7 +73,7 @@ func caesar() *cli.Command {
 			{
 				Name:    "decode",
 				Aliases: []string{"d"},
-				Usage:   "decode a string",
+				Usage:   "with string to decode and positive integer offset",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
@@ -100,7 +100,7 @@ func playfair() *cli.Command {
 			{
 				Name:    "encode",
 				Aliases: []string{"e"},
-				Usage:   "encode a string",
+				Usage:   "with string to encode and key string",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
@@ -114,7 +114,7 @@ func playfair() *cli.Command {
 			{
 				Name:    "decode",
 				Aliases: []string{"d"},
-				Usage:   "decode a string",
+				Usage:   "with string to decode and key string",
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
