@@ -13,10 +13,10 @@ import (
 )
 
 type gridFuncs struct {
-	// given a row or column position (i or j), returns the new one
-	shiftPos func(j int) int
-	// given the positions of the digram elements, returns the new j value for each
-	shiftRectangle func(firstPos [2]int, secondPos [2]int) (int, int)
+	// given a row or column position, returns the new one
+	shiftPos func(int) int
+	// given the positions of the digram elements, returns the new column value for each
+	shiftRectangle func([2]int, [2]int) (int, int)
 }
 
 var encodeFuncs = gridFuncs{
