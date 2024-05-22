@@ -1,17 +1,36 @@
 # ciphers
 
-A fun little CLI program to encode/decode strings in various famous historical cipher schemes.
+A fun little CLI program to encode/decode strings in various historical cipher schemes.
 
-## build
+So far, the following are implemented:
+
+* [Caesar](https://en.wikipedia.org/wiki/Caesar_cipher)
+* [Vigenère](https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher)
+* [Playfair](https://en.wikipedia.org/wiki/Playfair_cipher)
+
+## build 🛠️
 
 Run `go build -o bin/cipher cmd/cipher/main.go`
 
-## run
+## run 🏃‍♂️‍➡️
 
 `bin/cipher`
 
-will provide command descriptions, but basically the scheme is:
+```
+NAME:
+   cipher - encode and decode in various historical ciphers
 
-`bin/cipher <cipher name> <encode | decode> "text to encode/decode" <offset, key, etc. (depending on cipher scheme)>`
+USAGE:
+   cipher [global options] command [command options]
 
-Have fun!
+COMMANDS:
+   caesar, cs    encode or decode with Caesar cipher
+   vigenere, vg  encode or decode with Vigenère cipher
+   playfair, pf  encode or decode with Playfair cipher
+   help, h       Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --help, -h  show help
+```
+
+Have fun! 🥳

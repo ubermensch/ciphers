@@ -1,9 +1,9 @@
 package ciphers
 
 type Encoder interface {
-	Encode(string) (string, error)
+	Encode(string) string
 }
 
 type Decoder interface {
-	Decode(string) (string, error)
+	Decode(string) string
 }
