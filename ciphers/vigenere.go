@@ -13,33 +13,33 @@ type Vigenere struct {
 	Decoder
 }
 
-func (v *Vigenere) offset(b byte) int {
+func (v *Vigenere) offset(c rune) int {
 	switch {
-	case b <= 122 && b >= 97:
+	case c <= 122 && c >= 97:
 		// lower case alpha
-		encInt := int(b) - 97
+		encInt := int(c) - 97
 		return encInt
-	case b <= 90 && b >= 65:
+	case c <= 90 && c >= 65:
 		// upper case alpha
-		encInt := int(b) - 65
+		encInt := int(c) - 65
 		return encInt
 	default:
 		return 0
 	}
 }
 
-func (v *Vigenere) encodeByte(b byte, keyByte byte) byte {
-	var encoded byte
+func (v *Vigenere) encodeChar(c rune, keyRune rune) rune {
+	var encoded rune
 	var err error
 
-	offset := v.offset(keyByte)
+	offset := v.offset(keyRune)
 	switch {
-	case v.lowerRing.Contains(b):
-		encoded, err = v.lowerRing.Move(b, offset)
-	case v.upperRing.Contains(b):
-		encoded, err = v.upperRing.Move(b, offset)
+	case v.lowerRing.Contains(c):
+		encoded, err = v.lowerRing.Move(c, offset)
+	case v.upperRing.Contains(c):
+		encoded, err = v.upperRing.Move(c, offset)
 	default:
-		encoded, err = b, nil
+		encoded, err = c, nil
 	}
 
 	if err != nil {
@@ -49,48 +49,48 @@ func (v *Vigenere) encodeByte(b byte, keyByte byte) byte {
 	return encoded
 }
 
-func (v *Vigenere) decodeByte(b byte, keyByte byte) byte {
-	var decoded byte
+func (v *Vigenere) decodeChar(c rune, keyRune rune) rune {
+	var decoded rune
 	var err error
 
-	offset := v.offset(keyByte)
+	offset := v.offset(keyRune)
 	switch {
-	case v.lowerRing.Contains(b):
-		decoded, err = v.lowerRing.Move(b, -offset)
-	case v.upperRing.Contains(b):
-		decoded, err = v.upperRing.Move(b, -offset)
+	case v.lowerRing.Contains(c):
+		decoded, err = v.lowerRing.Move(c, -offset)
+	case v.upperRing.Contains(c):
+		decoded, err = v.upperRing.Move(c, -offset)
 	default:
-		decoded, err = b, nil
+		decoded, err = c, nil
 	}
 
 	if err != nil {
-		panic("error decoding byte")
+		panic("error decoding character")
 	}
 
 	return decoded
 }
 
 func (v *Vigenere) Encode(s string) string {
-	var runes []byte
+	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
-		keyByte := []byte(v.key)[i%len(v.key)]
-		nextByte := v.encodeByte(byte(curr), keyByte)
+		keyRune := []rune(v.key)[i%len(v.key)]
+		nextByte := v.encodeChar(curr, keyRune)
 		runes = append(runes, nextByte)
 	}
 	return string(runes)
 }
 
 func (v *Vigenere) Decode(s string) string {
-	var runes []byte
+	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
-		keyByte := []byte(v.key)[i%len(v.key)]
-		runes = append(runes, v.decodeByte(byte(curr), keyByte))
+		keyRune := []rune(v.key)[i%len(v.key)]
+		runes = append(runes, v.decodeChar(curr, keyRune))
 	}
 	return string(runes)
 }
