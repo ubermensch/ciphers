@@ -12,8 +12,8 @@ type Caesar struct {
 	Decoder
 }
 
-func (c *Caesar) encodeByte(b byte) byte {
-	var encoded byte
+func (c *Caesar) encodeChar(b rune) rune {
+	var encoded rune
 	var err error
 
 	switch {
@@ -26,14 +26,14 @@ func (c *Caesar) encodeByte(b byte) byte {
 	}
 
 	if err != nil {
-		panic("error encoding byte")
+		panic("error encoding character")
 	}
 
 	return encoded
 }
 
-func (c *Caesar) decodeByte(b byte) byte {
-	var decoded byte
+func (c *Caesar) decodeChar(b rune) rune {
+	var decoded rune
 	var err error
 
 	switch {
@@ -46,24 +46,24 @@ func (c *Caesar) decodeByte(b byte) byte {
 	}
 
 	if err != nil {
-		panic("error decoding byte")
+		panic("error decoding character")
 	}
 
 	return decoded
 }
 
 func (c *Caesar) Encode(s string) string {
-	var runes []byte
+	var runes []rune
 	for _, curr := range s {
-		runes = append(runes, c.encodeByte(byte(curr)))
+		runes = append(runes, c.encodeChar(curr))
 	}
 	return string(runes)
 }
 
 func (c *Caesar) Decode(s string) string {
-	var runes []byte
+	var runes []rune
 	for _, curr := range s {
-		runes = append(runes, c.decodeByte(byte(curr)))
+		runes = append(runes, c.decodeChar(curr))
 	}
 	return string(runes)
 }

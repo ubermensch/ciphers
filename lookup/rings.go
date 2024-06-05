@@ -9,10 +9,10 @@ import (
 type AlphaRing struct {
 	Items   *ring.Ring
 	lower   bool
-	letters []byte
+	letters []rune
 }
 
-var lowerLetters = []byte{
+var lowerLetters = []rune{
 	'a', 'b', 'c', 'd', 'e',
 	'f', 'g', 'h', 'i', 'j',
 	'k', 'l', 'm', 'n', 'o',
@@ -20,7 +20,7 @@ var lowerLetters = []byte{
 	'u', 'v', 'w', 'x', 'y', 'z',
 }
 
-var upperLetters = []byte{
+var upperLetters = []rune{
 	'A', 'B', 'C', 'D', 'E',
 	'F', 'G', 'H', 'I', 'J',
 	'K', 'L', 'M', 'N', 'O',
@@ -28,22 +28,22 @@ var upperLetters = []byte{
 	'U', 'V', 'W', 'X', 'Y', 'Z',
 }
 
-func (r *AlphaRing) Contains(b byte) bool {
-	return slices.Index(r.letters, b) > -1
+func (r *AlphaRing) Contains(c rune) bool {
+	return slices.Index(r.letters, c) > -1
 }
 
 // Returns the byte `i` positions ahead or behind the `from` byte
-func (r *AlphaRing) Move(from byte, i int) (byte, error) {
+func (r *AlphaRing) Move(from rune, i int) (rune, error) {
 	if !r.Contains(from) {
 		return 0, errors.New("byte not present in AlphaRing")
 	}
 	iFrom := slices.Index(r.letters, from)
-	result := r.Items.Move(iFrom + i).Value.(byte)
+	result := r.Items.Move(iFrom + i).Value.(rune)
 	return result, nil
 }
 
 func NewAlphaRing(lower bool) *AlphaRing {
-	alphaItems := func() []byte {
+	alphaItems := func() []rune {
 		if lower {
 			return lowerLetters
 		}
