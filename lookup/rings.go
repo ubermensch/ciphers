@@ -7,7 +7,7 @@ import (
 )
 
 type AlphaRing struct {
-	Items   *ring.Ring
+	items   *ring.Ring
 	lower   bool
 	letters []rune
 }
@@ -38,7 +38,7 @@ func (r *AlphaRing) Move(from rune, i int) (rune, error) {
 		return 0, errors.New("byte not present in AlphaRing")
 	}
 	iFrom := slices.Index(r.letters, from)
-	result := r.Items.Move(iFrom + i).Value.(rune)
+	result := r.items.Move(iFrom + i).Value.(rune)
 	return result, nil
 }
 
@@ -57,7 +57,7 @@ func NewAlphaRing(lower bool) *AlphaRing {
 	}
 
 	return &AlphaRing{
-		Items:   items,
+		items:   items,
 		lower:   lower,
 		letters: alphaItems,
 	}
