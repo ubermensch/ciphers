@@ -212,7 +212,7 @@ func (p *Playfair) isColumn(dg []rune) bool {
 	return false
 }
 
-func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
+func (p *Playfair) encodeDigram(dg *[]rune) (*[]rune, error) {
 	var encodedDigram *[]rune
 	firstPos, secondPos := p.digramPos(*dg)
 	switch {
@@ -233,17 +233,15 @@ func (p *Playfair) encodeDigram(dg *[]rune) *[]rune {
 			p.grid[secondPos[0]][secondNewCol],
 		}
 	default:
-		panic(
-			errors.New(
-				fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
-			),
+		return nil, errors.New(
+			fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
 		)
 	}
 
-	return encodedDigram
+	return encodedDigram, nil
 }
 
-func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
+func (p *Playfair) decodeDigram(dg *[]rune) (*[]rune, error) {
 	var decodedDigram *[]rune
 	firstPos, secondPos := p.digramPos(*dg)
 	switch {
@@ -264,38 +262,56 @@ func (p *Playfair) decodeDigram(dg *[]rune) *[]rune {
 			p.grid[secondPos[0]][secondNewCol],
 		}
 	default:
-		panic(
-			errors.New(
-				fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
-			),
+		return nil, errors.New(
+			fmt.Sprintf("digram does not form recognized shape: %s", string(*dg)),
 		)
 	}
 
-	return decodedDigram
+	return decodedDigram, nil
 }
 
-func (p *Playfair) Encode(input string) string {
+func (p *Playfair) Encode(input string) (string, error) {
 	// build digrams from input
 	p.digrams = getDigrams(input)
+	var encError error = nil
 
 	encodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
-		e := *p.encodeDigram(&dg)
+		enc, err := p.encodeDigram(&dg)
+		if err != nil {
+			encError = err
+			return ""
+		}
+
+		e := *enc
 		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
 	})
 
-	return strings.Join(encodedDigrams, " ")
+	if encError != nil {
+		return "", encError
+	}
+	return strings.Join(encodedDigrams, " "), nil
 }
 
-func (p *Playfair) Decode(input string) string {
+func (p *Playfair) Decode(input string) (string, error) {
 	// build digrams from input
 	p.digrams = getDigrams(input)
+	var decError error = nil
 
 	decodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
-		e := *p.decodeDigram(&dg)
-		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
+		dec, err := p.decodeDigram(&dg)
+		if err != nil {
+			decError = err
+			return ""
+		}
+
+		d := *dec
+		return fmt.Sprintf(`%s%s`, string(d[0]), string(d[1]))
 	})
 
-	return strings.Join(decodedDigrams, " ")
+	if decError != nil {
+		return "", decError
+	}
+	return strings.Join(decodedDigrams, " "), nil
 }
 
 func NewPlayfair(key string) *Playfair {

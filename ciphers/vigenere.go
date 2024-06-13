@@ -28,7 +28,7 @@ func (v *Vigenere) offset(c rune) int {
 	}
 }
 
-func (v *Vigenere) encodeChar(c rune, keyRune rune) rune {
+func (v *Vigenere) encodeChar(c rune, keyRune rune) (rune, error) {
 	var encoded rune
 	var err error
 
@@ -43,13 +43,13 @@ func (v *Vigenere) encodeChar(c rune, keyRune rune) rune {
 	}
 
 	if err != nil {
-		panic("error encoding byte")
+		return 0, err
 	}
 
-	return encoded
+	return encoded, nil
 }
 
-func (v *Vigenere) decodeChar(c rune, keyRune rune) rune {
+func (v *Vigenere) decodeChar(c rune, keyRune rune) (rune, error) {
 	var decoded rune
 	var err error
 
@@ -64,35 +64,44 @@ func (v *Vigenere) decodeChar(c rune, keyRune rune) rune {
 	}
 
 	if err != nil {
-		panic("error decoding character")
+		return 0, err
 	}
 
-	return decoded
+	return decoded, nil
 }
 
-func (v *Vigenere) Encode(s string) string {
+func (v *Vigenere) Encode(s string) (string, error) {
 	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
 		keyRune := []rune(v.key)[i%len(v.key)]
-		nextByte := v.encodeChar(curr, keyRune)
+		nextByte, err := v.encodeChar(curr, keyRune)
+		if err != nil {
+			return "", err
+		}
 		runes = append(runes, nextByte)
 	}
-	return string(runes)
+
+	return string(runes), nil
 }
 
-func (v *Vigenere) Decode(s string) string {
+func (v *Vigenere) Decode(s string) (string, error) {
 	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
 		keyRune := []rune(v.key)[i%len(v.key)]
-		runes = append(runes, v.decodeChar(curr, keyRune))
+		nextByte, err := v.decodeChar(curr, keyRune)
+		if err != nil {
+			return "", err
+		}
+		runes = append(runes, nextByte)
 	}
-	return string(runes)
+
+	return string(runes), nil
 }
 
 func NewVigenere(key string) *Vigenere {
