@@ -67,8 +67,8 @@ func caesar() *cli.Command {
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
-					if convErr != nil || offset < 1 {
-						panic("expected positive integer offset")
+					if convErr != nil {
+						return errors.New("expected positive integer offset")
 					}
 
 					caesar := ciphers.NewCaesar(offset)
@@ -88,8 +88,8 @@ func caesar() *cli.Command {
 				Action: func(cCtx *cli.Context) error {
 					str := cCtx.Args().Get(0)
 					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
-					if convErr != nil || offset < 1 {
-						panic("expected positive integer offset")
+					if convErr != nil {
+						return errors.New("expected positive integer offset")
 					}
 
 					caesar := ciphers.NewCaesar(offset)

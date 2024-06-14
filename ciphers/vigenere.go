@@ -2,6 +2,7 @@ package ciphers
 
 import (
 	"ciphers/lookup"
+	"errors"
 )
 
 // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
@@ -71,6 +72,10 @@ func (v *Vigenere) decodeChar(c rune, keyRune rune) (rune, error) {
 }
 
 func (v *Vigenere) Encode(s string) (string, error) {
+	if len(v.key) == 0 {
+		return "", errors.New("empty key")
+	}
+
 	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string
@@ -88,6 +93,10 @@ func (v *Vigenere) Encode(s string) (string, error) {
 }
 
 func (v *Vigenere) Decode(s string) (string, error) {
+	if len(v.key) == 0 {
+		return "", errors.New("empty key")
+	}
+
 	var runes []rune
 	for i, curr := range s {
 		// key repeats until it's the same length as string

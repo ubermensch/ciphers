@@ -91,6 +91,14 @@ func (suite *CaesarTest) TestDecoding() {
 	}
 }
 
+func (suite *CaesarTest) TestErrors() {
+	// should error with non-positive offset
+	cs := NewCaesar(-1)
+	_, err := cs.Encode("this won't work")
+	suite.NotNil(err)
+	suite.Equal("expected positive integer offset", err.Error())
+}
+
 func TestCaesar(t *testing.T) {
 	suite.Run(t, new(CaesarTest))
 }

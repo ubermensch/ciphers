@@ -2,6 +2,7 @@ package ciphers
 
 import (
 	"ciphers/lookup"
+	"errors"
 )
 
 type Caesar struct {
@@ -53,6 +54,10 @@ func (c *Caesar) decodeChar(b rune) (rune, error) {
 }
 
 func (c *Caesar) Encode(s string) (string, error) {
+	if c.offset < 1 {
+		return "", errors.New("expected positive integer offset")
+	}
+
 	var runes []rune
 	for _, curr := range s {
 		enc, err := c.encodeChar(curr)
@@ -65,6 +70,10 @@ func (c *Caesar) Encode(s string) (string, error) {
 }
 
 func (c *Caesar) Decode(s string) (string, error) {
+	if c.offset < 1 {
+		return "", errors.New("expected positive integer offset")
+	}
+
 	var runes []rune
 	for _, curr := range s {
 		dec, err := c.decodeChar(curr)
