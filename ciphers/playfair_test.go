@@ -98,10 +98,11 @@ func (suite *PlayfairTest) TestEncode() {
 	for _, cs := range suite.encodeCases {
 		key, input := cs.key, cs.input
 		playfair := NewPlayfair(key)
-		output := playfair.Encode(input)
+		enc, err := playfair.Encode(input)
 
+		suite.Nil(err)
 		suite.Equal(
-			cs.output, output,
+			cs.output, enc,
 		)
 		suite.Equal(
 			cs.digrams, playfair.digrams,
@@ -113,10 +114,11 @@ func (suite *PlayfairTest) TestDecode() {
 	for _, cs := range suite.decodeCases {
 		key, input := cs.key, cs.input
 		playfair := NewPlayfair(key)
-		output := playfair.Decode(input)
+		dec, err := playfair.Decode(input)
 
+		suite.Nil(err)
 		suite.Equal(
-			cs.output, output,
+			cs.output, dec,
 		)
 
 		suite.Equal(
