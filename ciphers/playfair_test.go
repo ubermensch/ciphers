@@ -127,6 +127,14 @@ func (suite *PlayfairTest) TestDecode() {
 	}
 }
 
+func (suite *PlayfairTest) TestErrors() {
+	// should error with empty string key
+	pf := NewPlayfair("")
+	_, err := pf.Encode("this won't work")
+	suite.NotNil(err)
+	suite.Equal("empty key", err.Error())
+}
+
 func TestPlayfair(t *testing.T) {
 	suite.Run(t, new(PlayfairTest))
 }
