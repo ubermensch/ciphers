@@ -271,6 +271,10 @@ func (p *Playfair) decodeDigram(dg *[]rune) (*[]rune, error) {
 }
 
 func (p *Playfair) Encode(input string) (string, error) {
+	if len(p.key) == 0 {
+		return "", errors.New("empty key")
+	}
+
 	// build digrams from input
 	p.digrams = getDigrams(input)
 	var encError error = nil
@@ -293,6 +297,10 @@ func (p *Playfair) Encode(input string) (string, error) {
 }
 
 func (p *Playfair) Decode(input string) (string, error) {
+	if len(p.key) == 0 {
+		return "", errors.New("empty key")
+	}
+
 	// build digrams from input
 	p.digrams = getDigrams(input)
 	var decError error = nil

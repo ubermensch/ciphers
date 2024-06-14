@@ -89,6 +89,14 @@ func (suite *VigenereTest) TestDecoding() {
 	}
 }
 
+func (suite *VigenereTest) TestErrors() {
+	// should error with empty string key
+	vg := NewVigenere("")
+	_, err := vg.Encode("this won't work")
+	suite.NotNil(err)
+	suite.Equal("empty key", err.Error())
+}
+
 func TestVigenere(t *testing.T) {
 	suite.Run(t, new(VigenereTest))
 }
