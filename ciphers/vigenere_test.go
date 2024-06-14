@@ -65,9 +65,12 @@ func (suite *VigenereTest) TestEncoding() {
 	for i, key := range suite.vigenereEncode.keys {
 		vg := NewVigenere(key)
 
+		enc, err := vg.Encode(suite.vigenereEncode.inputs[i])
+
+		suite.Nil(err)
 		suite.Equal(
 			suite.vigenereEncode.expectedOutputs[i],
-			vg.Encode(suite.vigenereEncode.inputs[i]),
+			enc,
 		)
 	}
 }
@@ -76,9 +79,12 @@ func (suite *VigenereTest) TestDecoding() {
 	for i, key := range suite.vigenereDecode.keys {
 		vg := NewVigenere(key)
 
+		dec, err := vg.Decode(suite.vigenereDecode.inputs[i])
+
+		suite.Nil(err)
 		suite.Equal(
 			suite.vigenereDecode.expectedOutputs[i],
-			vg.Decode(suite.vigenereDecode.inputs[i]),
+			dec,
 		)
 	}
 }

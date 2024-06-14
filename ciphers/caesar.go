@@ -12,7 +12,7 @@ type Caesar struct {
 	Decoder
 }
 
-func (c *Caesar) encodeChar(b rune) rune {
+func (c *Caesar) encodeChar(b rune) (rune, error) {
 	var encoded rune
 	var err error
 
@@ -26,13 +26,13 @@ func (c *Caesar) encodeChar(b rune) rune {
 	}
 
 	if err != nil {
-		panic("error encoding character")
+		return 0, err
 	}
 
-	return encoded
+	return encoded, nil
 }
 
-func (c *Caesar) decodeChar(b rune) rune {
+func (c *Caesar) decodeChar(b rune) (rune, error) {
 	var decoded rune
 	var err error
 
@@ -46,26 +46,34 @@ func (c *Caesar) decodeChar(b rune) rune {
 	}
 
 	if err != nil {
-		panic("error decoding character")
+		return 0, err
 	}
 
-	return decoded
+	return decoded, nil
 }
 
-func (c *Caesar) Encode(s string) string {
+func (c *Caesar) Encode(s string) (string, error) {
 	var runes []rune
 	for _, curr := range s {
-		runes = append(runes, c.encodeChar(curr))
+		enc, err := c.encodeChar(curr)
+		if err != nil {
+			return "", err
+		}
+		runes = append(runes, enc)
 	}
-	return string(runes)
+	return string(runes), nil
 }
 
-func (c *Caesar) Decode(s string) string {
+func (c *Caesar) Decode(s string) (string, error) {
 	var runes []rune
 	for _, curr := range s {
-		runes = append(runes, c.decodeChar(curr))
+		dec, err := c.decodeChar(curr)
+		if err != nil {
+			return "", err
+		}
+		runes = append(runes, dec)
 	}
-	return string(runes)
+	return string(runes), nil
 }
 
 func NewCaesar(offset int) *Caesar {

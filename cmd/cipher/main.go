@@ -2,6 +2,7 @@ package main
 
 import (
 	"ciphers/ciphers"
+	"errors"
 	"fmt"
 	"github.com/urfave/cli/v2"
 	"log"
@@ -23,7 +24,10 @@ func vigenere() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					vig := ciphers.NewVigenere(key)
-					encoded := vig.Encode(str)
+					encoded, err := vig.Encode(str)
+					if err != nil {
+						return errors.New("could not encode: " + err.Error())
+					}
 
 					fmt.Println(encoded)
 					return nil
@@ -37,7 +41,10 @@ func vigenere() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					vig := ciphers.NewVigenere(key)
-					decoded := vig.Decode(str)
+					decoded, err := vig.Decode(str)
+					if err != nil {
+						return errors.New("could not decode: " + err.Error())
+					}
 
 					fmt.Println(decoded)
 					return nil
@@ -65,7 +72,11 @@ func caesar() *cli.Command {
 					}
 
 					caesar := ciphers.NewCaesar(offset)
-					encoded := caesar.Encode(str)
+					encoded, err := caesar.Encode(str)
+					if err != nil {
+						return errors.New("could not encode: " + err.Error())
+					}
+
 					fmt.Println(encoded)
 					return nil
 				},
@@ -82,7 +93,11 @@ func caesar() *cli.Command {
 					}
 
 					caesar := ciphers.NewCaesar(offset)
-					decoded := caesar.Decode(str)
+					decoded, err := caesar.Decode(str)
+					if err != nil {
+						return errors.New("could not decode: " + err.Error())
+					}
+
 					fmt.Println(decoded)
 					return nil
 				},
@@ -105,7 +120,10 @@ func playfair() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					pf := ciphers.NewPlayfair(key)
-					encoded := pf.Encode(str)
+					encoded, err := pf.Encode(str)
+					if err != nil {
+						return errors.New("could not encode: " + err.Error())
+					}
 
 					fmt.Println(encoded)
 					return nil
@@ -119,7 +137,10 @@ func playfair() *cli.Command {
 					str := cCtx.Args().Get(0)
 					key := cCtx.Args().Get(1)
 					pf := ciphers.NewPlayfair(key)
-					decoded := pf.Decode(str)
+					decoded, err := pf.Decode(str)
+					if err != nil {
+						return errors.New("could not decode: " + err.Error())
+					}
 
 					fmt.Println(decoded)
 					return nil

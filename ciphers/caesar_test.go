@@ -67,9 +67,12 @@ func (suite *CaesarTest) TestEncoding() {
 	for i, offset := range suite.caesarEncode.offsets {
 		cs := NewCaesar(offset)
 
+		enc, err := cs.Encode(suite.caesarEncode.inputs[i])
+		suite.Nil(err)
+
 		suite.Equal(
 			suite.caesarEncode.expectedOutputs[i],
-			cs.Encode(suite.caesarEncode.inputs[i]),
+			enc,
 		)
 	}
 }
@@ -78,9 +81,12 @@ func (suite *CaesarTest) TestDecoding() {
 	for i, offset := range suite.caesarDecode.offsets {
 		cs := NewCaesar(offset)
 
+		dec, err := cs.Decode(suite.caesarDecode.inputs[i])
+		suite.Nil(err)
+
 		suite.Equal(
 			suite.caesarDecode.expectedOutputs[i],
-			cs.Decode(suite.caesarDecode.inputs[i]),
+			dec,
 		)
 	}
 }
