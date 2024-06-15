@@ -3,6 +3,7 @@ package ciphers
 import (
 	"ciphers/lookup"
 	"errors"
+	"sync"
 )
 
 // https://en.wikipedia.org/wiki/Vigen%C3%A8re_cipher
@@ -76,17 +77,35 @@ func (v *Vigenere) Encode(s string) (string, error) {
 		return "", errors.New("empty key")
 	}
 
-	var runes []rune
-	for i, curr := range s {
+	// initialize the encoded runes as the string to encode
+	runes := []rune(s)
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	// encode each character in parallel
+	encFunc := func(r rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
-		keyRune := []rune(v.key)[i%len(v.key)]
-		nextByte, err := v.encodeChar(curr, keyRune)
+		keyRune := []rune(v.key)[pos%len(v.key)]
+
+		enc, err := v.encodeChar(r, keyRune)
 		if err != nil {
-			return "", err
+			errCount++
 		}
-		runes = append(runes, nextByte)
+
+		runes[pos] = enc
+	}
+
+	for i, curr := range s {
+		wg.Add(1)
+		go encFunc(curr, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("encoding failed")
 	}
 
 	return string(runes), nil
@@ -97,17 +116,33 @@ func (v *Vigenere) Decode(s string) (string, error) {
 		return "", errors.New("empty key")
 	}
 
-	var runes []rune
-	for i, curr := range s {
+	// initialize the encoded runes as the string to decode
+	runes := []rune(s)
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	decFunc := func(r rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
 		// key repeats until it's the same length as string
 		// to encrypt. e.g. input string `attackatdawn` and key
 		// `LEMON` gives padded key `LEMONLEMONLE`.
-		keyRune := []rune(v.key)[i%len(v.key)]
-		nextByte, err := v.decodeChar(curr, keyRune)
+		keyRune := []rune(v.key)[pos%len(v.key)]
+		dec, err := v.decodeChar(r, keyRune)
 		if err != nil {
-			return "", err
+			errCount++
 		}
-		runes = append(runes, nextByte)
+
+		runes[pos] = dec
+	}
+
+	for i, curr := range s {
+		wg.Add(1)
+		go decFunc(curr, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("decoding failed")
 	}
 
 	return string(runes), nil

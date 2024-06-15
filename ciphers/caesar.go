@@ -94,15 +94,31 @@ func (c *Caesar) Decode(s string) (string, error) {
 		return "", errors.New("expected positive integer offset")
 	}
 
-	// initialize the decoded runes as the string to decode
-	var runes []rune
-	for _, curr := range s {
-		dec, err := c.decodeChar(curr)
+	// initialize the encoded runes as the string to decode
+	runes := []rune(s)
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	decFunc := func(r rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
+		dec, err := c.decodeChar(r)
 		if err != nil {
-			return "", err
+			errCount++
 		}
-		runes = append(runes, dec)
+
+		runes[pos] = dec
 	}
+
+	for i, curr := range s {
+		wg.Add(1)
+		go decFunc(curr, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("decoding failed")
+	}
+
 	return string(runes), nil
 }
 
