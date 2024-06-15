@@ -3,6 +3,7 @@ package ciphers
 import (
 	"ciphers/lookup"
 	"errors"
+	"sync"
 )
 
 type Caesar struct {
@@ -58,14 +59,33 @@ func (c *Caesar) Encode(s string) (string, error) {
 		return "", errors.New("expected positive integer offset")
 	}
 
-	var runes []rune
-	for _, curr := range s {
-		enc, err := c.encodeChar(curr)
+	// initialize the encoded runes as the string to encode
+	runes := []rune(s)
+
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	// encode each character in parallel
+	encFunc := func(r rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
+		enc, err := c.encodeChar(r)
+
 		if err != nil {
-			return "", err
+			errCount++
 		}
-		runes = append(runes, enc)
+		runes[pos] = enc
 	}
+
+	for i, curr := range s {
+		wg.Add(1)
+		go encFunc(curr, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("encoding failed")
+	}
+
 	return string(runes), nil
 }
 
@@ -74,6 +94,7 @@ func (c *Caesar) Decode(s string) (string, error) {
 		return "", errors.New("expected positive integer offset")
 	}
 
+	// initialize the decoded runes as the string to decode
 	var runes []rune
 	for _, curr := range s {
 		dec, err := c.decodeChar(curr)
