@@ -77,8 +77,7 @@ func (v *Vigenere) Encode(s string) (string, error) {
 		return "", errors.New("empty key")
 	}
 
-	// initialize the encoded runes as the string to encode
-	runes := []rune(s)
+	runes := make([]rune, len(s))
 	wg := sync.WaitGroup{}
 	errCount := 0
 
@@ -116,8 +115,7 @@ func (v *Vigenere) Decode(s string) (string, error) {
 		return "", errors.New("empty key")
 	}
 
-	// initialize the encoded runes as the string to decode
-	runes := []rune(s)
+	runes := make([]rune, len(s))
 	wg := sync.WaitGroup{}
 	errCount := 0
 

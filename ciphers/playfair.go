@@ -5,10 +5,10 @@ import (
 	"ciphers/lookup"
 	"errors"
 	"fmt"
-	lo "github.com/samber/lo"
 	"regexp"
 	"slices"
 	"strings"
+	"sync"
 	"unicode"
 )
 
@@ -277,22 +277,32 @@ func (p *Playfair) Encode(input string) (string, error) {
 
 	// build digrams from input
 	p.digrams = getDigrams(input)
-	var encError error = nil
 
-	encodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
+	encodedDigrams := make([]string, len(p.digrams))
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	encFunc := func(dg []rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
 		enc, err := p.encodeDigram(&dg)
 		if err != nil {
-			encError = err
-			return ""
+			errCount++
 		}
-
 		e := *enc
-		return fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
-	})
-
-	if encError != nil {
-		return "", encError
+		encStr := fmt.Sprintf(`%s%s`, string(e[0]), string(e[1]))
+		encodedDigrams[pos] = encStr
 	}
+
+	for i, dg := range p.digrams {
+		wg.Add(1)
+		go encFunc(dg, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("encoding failed")
+	}
+
 	return strings.Join(encodedDigrams, " "), nil
 }
 
@@ -303,22 +313,32 @@ func (p *Playfair) Decode(input string) (string, error) {
 
 	// build digrams from input
 	p.digrams = getDigrams(input)
-	var decError error = nil
 
-	decodedDigrams := lo.Map(p.digrams, func(dg []rune, i int) string {
+	decodedDigrams := make([]string, len(p.digrams))
+	wg := sync.WaitGroup{}
+	errCount := 0
+
+	decFunc := func(dg []rune, pos int, wg *sync.WaitGroup) {
+		defer wg.Done()
 		dec, err := p.decodeDigram(&dg)
 		if err != nil {
-			decError = err
-			return ""
+			errCount++
 		}
-
 		d := *dec
-		return fmt.Sprintf(`%s%s`, string(d[0]), string(d[1]))
-	})
-
-	if decError != nil {
-		return "", decError
+		decStr := fmt.Sprintf(`%s%s`, string(d[0]), string(d[1]))
+		decodedDigrams[pos] = decStr
 	}
+
+	for i, dg := range p.digrams {
+		wg.Add(1)
+		go decFunc(dg, i, &wg)
+	}
+
+	wg.Wait()
+	if errCount > 0 {
+		return "", errors.New("decoding failed")
+	}
+
 	return strings.Join(decodedDigrams, " "), nil
 }
 
