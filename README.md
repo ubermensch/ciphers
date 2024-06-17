@@ -1,6 +1,6 @@
 # ciphers
 
-A fun little CLI program to encode/decode strings in various historical cipher schemes.
+A Go package and CLI tool to encode/decode strings in various historical cipher schemes.
 
 So far, the following are implemented:
 
