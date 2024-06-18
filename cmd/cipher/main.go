@@ -65,19 +65,38 @@ func caesar() *cli.Command {
 				Aliases: []string{"e"},
 				Usage:   "with string to encode and positive integer offset",
 				Action: func(cCtx *cli.Context) error {
-					str := cCtx.Args().Get(0)
-					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
+					var str string
+					offsetIdx := 1
+					if len(cCtx.String("input-file")) != 0 {
+						bytes, err := os.ReadFile(cCtx.String("input-file"))
+						if err != nil {
+							return errors.New("could not read from input file: " + err.Error())
+						}
+						str = string(bytes[:])
+						offsetIdx = 0
+					} else {
+						str = cCtx.Args().Get(0)
+					}
+					offset, convErr := strconv.Atoi(cCtx.Args().Get(offsetIdx))
 					if convErr != nil {
 						return errors.New("expected positive integer offset")
 					}
 
-					caesar := ciphers.NewCaesar(offset)
-					encoded, err := caesar.Encode(str)
+					cs := ciphers.NewCaesar(offset)
+					encoded, err := cs.Encode(str)
 					if err != nil {
 						return errors.New("could not encode: " + err.Error())
 					}
 
-					fmt.Println(encoded)
+					if len(cCtx.String("output-file")) != 0 {
+						writeErr := os.WriteFile(cCtx.String("output-file"), []byte(encoded), 0644)
+						if writeErr != nil {
+							return errors.New("could not write to output file: " + err.Error())
+						}
+					} else {
+						fmt.Println(encoded)
+					}
+
 					return nil
 				},
 			},
@@ -86,19 +105,38 @@ func caesar() *cli.Command {
 				Aliases: []string{"d"},
 				Usage:   "with string to decode and positive integer offset",
 				Action: func(cCtx *cli.Context) error {
-					str := cCtx.Args().Get(0)
-					offset, convErr := strconv.Atoi(cCtx.Args().Get(1))
+					var str string
+					offsetIdx := 1
+					if len(cCtx.String("input-file")) != 0 {
+						bytes, err := os.ReadFile(cCtx.String("input-file"))
+						if err != nil {
+							return errors.New("could not read from input file: " + err.Error())
+						}
+						str = string(bytes[:])
+						offsetIdx = 0
+					} else {
+						str = cCtx.Args().Get(0)
+					}
+					offset, convErr := strconv.Atoi(cCtx.Args().Get(offsetIdx))
 					if convErr != nil {
 						return errors.New("expected positive integer offset")
 					}
 
-					caesar := ciphers.NewCaesar(offset)
-					decoded, err := caesar.Decode(str)
+					cs := ciphers.NewCaesar(offset)
+					decoded, err := cs.Decode(str)
 					if err != nil {
 						return errors.New("could not decode: " + err.Error())
 					}
 
-					fmt.Println(decoded)
+					if len(cCtx.String("output-file")) != 0 {
+						writeErr := os.WriteFile(cCtx.String("output-file"), []byte(decoded), 0644)
+						if writeErr != nil {
+							return errors.New("could not write to output file: " + err.Error())
+						}
+					} else {
+						fmt.Println(decoded)
+					}
+
 					return nil
 				},
 			},
@@ -159,6 +197,10 @@ func main() {
 			caesar(),
 			vigenere(),
 			playfair(),
+		},
+		Flags: []cli.Flag{
+			&cli.StringFlag{Name: "input-file", Aliases: []string{"if"}},
+			&cli.StringFlag{Name: "output-file", Aliases: []string{"of"}},
 		},
 	}
 
