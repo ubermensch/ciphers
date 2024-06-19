@@ -30,7 +30,9 @@ COMMANDS:
    help, h       Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --help, -h  show help
+   --input-file value, --if value
+   --output-file value, --of value
+   --help, -h                       show help
 ```
 
 Have fun! 🥳
