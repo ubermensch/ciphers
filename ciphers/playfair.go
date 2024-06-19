@@ -2,9 +2,9 @@
 package ciphers
 
 import (
-	"ciphers/lookup"
 	"errors"
 	"fmt"
+	lookup "github.com/ubermensch/ciphers/lookup"
 	"regexp"
 	"slices"
 	"strings"
