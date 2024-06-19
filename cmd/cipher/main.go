@@ -1,9 +1,9 @@
 package main
 
 import (
-	"ciphers/ciphers"
 	"errors"
 	"fmt"
+	ciphers "github.com/ubermensch/ciphers/ciphers"
 	"github.com/urfave/cli/v2"
 	"log"
 	"os"

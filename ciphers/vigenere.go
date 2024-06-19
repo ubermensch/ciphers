@@ -1,8 +1,8 @@
 package ciphers
 
 import (
-	"ciphers/lookup"
 	"errors"
+	lookup "github.com/ubermensch/ciphers/lookup"
 	"sync"
 )
 
