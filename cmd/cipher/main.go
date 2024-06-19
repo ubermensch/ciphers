@@ -188,15 +188,22 @@ func playfair() *cli.Command {
 				Aliases: []string{"e"},
 				Usage:   "with string to encode and key string",
 				Action: func(cCtx *cli.Context) error {
-					str := cCtx.Args().Get(0)
-					key := cCtx.Args().Get(1)
-					pf := ciphers.NewPlayfair(key)
-					encoded, err := pf.Encode(str)
+					keyIdx := keyOrOffsetIndex(cCtx)
+					key := cCtx.Args().Get(keyIdx)
+
+					str, err := inputString(cCtx)
 					if err != nil {
-						return errors.New("could not encode: " + err.Error())
+						return err
 					}
 
-					fmt.Println(encoded)
+					pf := ciphers.NewPlayfair(key)
+					encoded, err := pf.Encode(str)
+
+					outputErr := handleOutput(cCtx, encoded)
+					if outputErr != nil {
+						return outputErr
+					}
+
 					return nil
 				},
 			},
@@ -205,15 +212,22 @@ func playfair() *cli.Command {
 				Aliases: []string{"d"},
 				Usage:   "with string to decode and key string",
 				Action: func(cCtx *cli.Context) error {
-					str := cCtx.Args().Get(0)
-					key := cCtx.Args().Get(1)
-					pf := ciphers.NewPlayfair(key)
-					decoded, err := pf.Decode(str)
+					keyIdx := keyOrOffsetIndex(cCtx)
+					key := cCtx.Args().Get(keyIdx)
+
+					str, err := inputString(cCtx)
 					if err != nil {
-						return errors.New("could not decode: " + err.Error())
+						return err
 					}
 
-					fmt.Println(decoded)
+					pf := ciphers.NewPlayfair(key)
+					decoded, err := pf.Decode(str)
+
+					outputErr := handleOutput(cCtx, decoded)
+					if outputErr != nil {
+						return outputErr
+					}
+
 					return nil
 				},
 			},
