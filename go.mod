@@ -1,4 +1,4 @@
-module ciphers
+module github.com/ubermensch/ciphers
 
 go 1.22.1
 
